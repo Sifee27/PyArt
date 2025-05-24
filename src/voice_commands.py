@@ -129,7 +129,8 @@ class VoiceCommandProcessor:
         if not self.is_listening:
             self.is_listening = True
             self.listen_thread = threading.Thread(target=self._listen_loop)
-            self.listen_thread.daemon = True            self.listen_thread.start()
+            self.listen_thread.daemon = True          
+            self.listen_thread.start()
             print("Voice command system is now listening")
     
     def stop_listening(self):
