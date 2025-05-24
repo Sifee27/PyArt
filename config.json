@@ -2,7 +2,7 @@
     "camera_index": 0,
     "frame_width": 640,
     "frame_height": 480,
-    "default_effect": "ascii_detailed",
-    "default_intensity": 1.0,
+    "default_effect": "ascii_psychedelic",
+    "default_intensity": 0.9,
     "save_directory": "saved_images"
 }

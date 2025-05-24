@@ -11,7 +11,7 @@ import os
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from effects import EffectProcessor
+from src.effects import EffectProcessor
 
 def create_test_pattern():
     """Create a test pattern with lines and shapes"""

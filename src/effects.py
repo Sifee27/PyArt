@@ -22,6 +22,8 @@ class EffectProcessor:
         self.ascii_chars_simple = "@%#*+=-:. "
         self.ascii_chars_detailed = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
         self.ascii_chars_blocks = "█▉▊▋▌▍▎▏ "
+        # New ASCII grid using only regular English characters
+        self.ascii_chars_grid = "#@8&WBMmwqpdbgXA$%Z0QOLCIUY[]}{?/\\+=-_~<>i!;:,\"^`'. "
         
         # Register all available effects
         self.effects: Dict[str, Callable] = {
@@ -33,6 +35,7 @@ class EffectProcessor:
             'ascii_inverted': self.ascii_inverted,
             'ascii_psychedelic': self.ascii_psychedelic,
             'ascii_rainbow': self.ascii_rainbow,
+            'ascii_grid': self.ascii_grid,  # Add new ASCII grid effect
             'color_inversion': self.color_inversion,
             'pixelation': self.pixelation,
             'edge_detection': self.edge_detection,
@@ -40,7 +43,14 @@ class EffectProcessor:
             'blur': self.blur,
             'posterize': self.posterize,
             'hsv_shift': self.hsv_shift,
-            'kaleidoscope': self.kaleidoscope
+            'kaleidoscope': self.kaleidoscope,
+            'matrix_rain': self.matrix_rain,
+            'thermal_vision': self.thermal_vision,
+            'glitch_art': self.glitch_art,
+            'oil_painting': self.oil_painting,
+            'retro_crt': self.retro_crt,
+            'neon_glow': self.neon_glow,
+            'watercolor': self.watercolor
         }
     
     def get_effect_names(self) -> list:
@@ -179,6 +189,208 @@ class EffectProcessor:
             rotation_matrix = cv2.getRotationMatrix2D((center_x, center_y), angle, 1.0)
             rotated = cv2.warpAffine(frame, rotation_matrix, (width, height))
             result = cv2.addWeighted(result, 0.7, rotated, 0.3, 0)
+        
+        return result
+    
+    def matrix_rain(self, frame: np.ndarray) -> np.ndarray:
+        """Apply Matrix-style digital rain effect"""
+        height, width = frame.shape[:2]
+        
+        # Convert to green-tinted image
+        green_frame = frame.copy()
+        green_frame[:, :, 0] = green_frame[:, :, 0] * 0.2  # Reduce blue
+        green_frame[:, :, 2] = green_frame[:, :, 2] * 0.2  # Reduce red
+        green_frame[:, :, 1] = np.clip(green_frame[:, :, 1] * 1.5, 0, 255)  # Enhance green
+        
+        # Create digital rain overlay
+        rain_overlay = np.zeros_like(frame)
+        
+        # Parameters based on intensity
+        num_streams = int(30 + 50 * self.intensity)
+        char_size = max(8, int(20 - 10 * self.intensity))
+        
+        # Matrix characters
+        matrix_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        
+        for i in range(num_streams):
+            x = int((i * width) / num_streams)
+            # Stream falls based on time
+            y_offset = (self.frame_counter * 3 + i * 20) % (height + 200)
+            
+            for j in range(0, height, char_size):
+                y = j + y_offset - 200
+                if 0 <= y < height:
+                    # Fade effect - characters are brighter at the "head" of the stream
+                    alpha = max(0, 1.0 - (j / (height * 0.7)))
+                    char = matrix_chars[(i + j + self.frame_counter) % len(matrix_chars)]
+                    
+                    # Draw character
+                    color = (0, int(255 * alpha), 0)  # Green
+                    cv2.putText(rain_overlay, char, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 
+                               0.4, color, 1)
+        
+        # Blend with original
+        return cv2.addWeighted(green_frame, 0.7, rain_overlay, 0.3, 0)
+    
+    def thermal_vision(self, frame: np.ndarray) -> np.ndarray:
+        """Apply thermal imaging effect"""
+        # Convert to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Apply thermal colormap
+        thermal = cv2.applyColorMap(gray, cv2.COLORMAP_JET)
+        
+        # Add some blur for thermal effect
+        thermal = cv2.GaussianBlur(thermal, (5, 5), 0)
+        
+        # Enhance based on intensity
+        if self.intensity > 1.0:
+            # Increase contrast
+            thermal = cv2.addWeighted(thermal, self.intensity, thermal, 0, -50)
+        
+        return thermal
+    
+    def glitch_art(self, frame: np.ndarray) -> np.ndarray:
+        """Apply digital glitch art effect"""
+        result = frame.copy()
+        height, width = frame.shape[:2]
+        
+        # Digital noise based on intensity
+        noise_level = int(20 * self.intensity)
+        
+        # RGB channel shifting
+        shift_amount = int(5 * self.intensity)
+        if shift_amount > 0:
+            # Shift red channel
+            result[:-shift_amount, :, 2] = frame[shift_amount:, :, 2]
+            # Shift blue channel
+            result[shift_amount:, :, 0] = frame[:-shift_amount, :, 0]
+        
+        # Random horizontal line displacement
+        num_glitches = int(10 * self.intensity)
+        for _ in range(num_glitches):
+            y = np.random.randint(0, height)
+            glitch_height = np.random.randint(1, 10)
+            displacement = np.random.randint(-20, 20)
+            
+            if y + glitch_height < height:
+                line = result[y:y+glitch_height, :].copy()
+                # Shift the line horizontally
+                if displacement > 0:
+                    result[y:y+glitch_height, displacement:] = line[:, :-displacement]
+                elif displacement < 0:
+                    result[y:y+glitch_height, :displacement] = line[:, -displacement:]
+        
+        # Add digital noise
+        noise = np.random.randint(0, noise_level, (height, width, 3), dtype=np.uint8)
+        result = cv2.add(result, noise)
+        
+        return result
+    
+    def oil_painting(self, frame: np.ndarray) -> np.ndarray:
+        """Apply oil painting artistic effect"""
+        # Bilateral filter for smooth regions while preserving edges
+        smooth = cv2.bilateralFilter(frame, 15, 80, 80)
+        
+        # Edge detection
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        edges = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+                                     cv2.THRESH_BINARY, 7, 7)
+        edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+        
+        # Combine smooth regions with edges
+        oil_effect = cv2.bitwise_and(smooth, edges)
+        
+        # Enhance saturation for oil painting look
+        hsv = cv2.cvtColor(oil_effect, cv2.COLOR_BGR2HSV)
+        hsv[:, :, 1] = cv2.multiply(hsv[:, :, 1], 1.3)  # Increase saturation
+        oil_effect = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+        
+        return oil_effect
+    
+    def retro_crt(self, frame: np.ndarray) -> np.ndarray:
+        """Apply retro CRT monitor effect"""
+        height, width = frame.shape[:2]
+        result = frame.copy()
+        
+        # Add scanlines
+        for y in range(0, height, 3):
+            result[y:y+1, :] = result[y:y+1, :] * 0.8
+        
+        # Add slight green tint
+        result[:, :, 1] = np.clip(result[:, :, 1] * 1.1, 0, 255)
+        
+        # Add vignette effect
+        center_x, center_y = width // 2, height // 2
+        max_distance = np.sqrt(center_x**2 + center_y**2)
+        
+        for y in range(height):
+            for x in range(width):
+                distance = np.sqrt((x - center_x)**2 + (y - center_y)**2)
+                vignette_factor = 1.0 - (distance / max_distance) * 0.3
+                result[y, x] = result[y, x] * vignette_factor
+        
+        # Add slight blur for CRT softness
+        result = cv2.GaussianBlur(result, (3, 3), 0)
+        
+        return result
+    
+    def neon_glow(self, frame: np.ndarray) -> np.ndarray:
+        """Apply neon glow effect"""
+        # Edge detection for neon outline
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        edges = cv2.Canny(gray, 50, 150)
+        
+        # Create multiple glow layers
+        glow_layers = []
+        for blur_size in [3, 7, 15, 31]:
+            glow = cv2.GaussianBlur(edges, (blur_size, blur_size), 0)
+            glow = cv2.cvtColor(glow, cv2.COLOR_GRAY2BGR)
+            glow_layers.append(glow)
+        
+        # Combine glow layers with different colors
+        neon_overlay = np.zeros_like(frame)
+        colors = [(255, 0, 255), (0, 255, 255), (255, 255, 0), (0, 255, 0)]  # Magenta, Cyan, Yellow, Green
+        
+        for i, (glow, color) in enumerate(zip(glow_layers, colors)):
+            colored_glow = np.zeros_like(frame)
+            for c in range(3):
+                colored_glow[:, :, c] = glow[:, :, 0] * (color[c] / 255.0)
+            neon_overlay = cv2.add(neon_overlay, colored_glow)
+        
+        # Darken original image
+        dark_frame = frame * 0.3
+        
+        # Combine with glow
+        result = cv2.addWeighted(dark_frame, 0.7, neon_overlay, 0.3, 0)
+        
+        return result.astype(np.uint8)
+    
+    def watercolor(self, frame: np.ndarray) -> np.ndarray:
+        """Apply watercolor painting effect"""
+        # Multiple bilateral filters for watercolor smoothness
+        watercolor = frame.copy()
+        for _ in range(3):
+            watercolor = cv2.bilateralFilter(watercolor, 9, 75, 75)
+        
+        # Edge detection
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        edges = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+                                     cv2.THRESH_BINARY, 7, 7)
+        
+        # Convert edges to 3-channel
+        edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+        
+        # Reduce edge intensity for watercolor look
+        edges = edges * 0.7
+        
+        # Combine watercolor and edges
+        result = cv2.bitwise_and(watercolor, edges)
+        
+        # Slightly desaturate for watercolor effect
+        hsv = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
+        hsv[:, :, 1] = hsv[:, :, 1] * 0.8  # Reduce saturation
+        result = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
         
         return result
     
@@ -384,3 +596,29 @@ class EffectProcessor:
         return self._ascii_to_image(ascii_chars, rainbow_colors, 
                                    (frame.shape[1], frame.shape[0]), 
                                    char_size, char_size, 0.3 + 0.3 * self.ascii_detail)
+    
+    def ascii_grid(self, frame: np.ndarray) -> np.ndarray:
+        """Convert frame to ASCII art in a grid pattern using regular characters"""
+        char_size = max(4, int(12 - 8 * self.ascii_detail))
+        
+        ascii_chars, colors, _ = self._frame_to_ascii_array(
+            frame, self.ascii_chars_grid, char_size, char_size
+        )
+        
+        # Create blank image
+        height, width = frame.shape[:2]
+        grid_image = np.zeros((height, width, 3), dtype=np.uint8)
+        
+        # Render ASCII characters line by line
+        for y, (char_row, color_row) in enumerate(zip(ascii_chars, colors)):
+            for x, (char, color) in enumerate(zip(char_row, color_row)):
+                if char != ' ':
+                    # Calculate position with some padding
+                    pos_x = x * char_size + 2
+                    pos_y = y * char_size + char_size - 2
+                    
+                    if pos_y < height and pos_x < width:
+                        cv2.putText(grid_image, char, (pos_x, pos_y), 
+                                  cv2.FONT_HERSHEY_SIMPLEX, 0.3, color, 1)
+        
+        return grid_image

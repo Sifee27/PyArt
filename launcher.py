@@ -1,3 +1,4 @@
+
 """
 PyArt Launcher
 Simple launcher script for PyArt with different options
@@ -5,6 +6,7 @@ Simple launcher script for PyArt with different options
 
 import sys
 import subprocess
+import argparse
 from src.utils import check_webcam_availability, print_system_info
 
 
@@ -43,6 +45,17 @@ def check_system():
 
 def main():
     """Main launcher function"""
+    # Check for command line arguments
+    parser = argparse.ArgumentParser(description='PyArt Launcher')
+    parser.add_argument('--voice', action='store_true', help='Launch PyArt with voice commands enabled')
+    args, unknown = parser.parse_known_args()
+    
+    # If voice command flag is passed, launch PyArt directly with voice commands
+    if args.voice:
+        print("Launching PyArt with voice commands enabled...")
+        subprocess.run([sys.executable, "main.py", "--voice"])
+        return
+    
     show_banner()
     
     if not check_system():
@@ -52,12 +65,70 @@ def main():
     
     print("\nChoose an option:")
     print("1. 🎥 Launch PyArt (webcam required)")
-    print("2. 🖼️  Run File Converter (convert images/videos to ASCII)")
-    print("3. 🎬 Run Effects Demo (no webcam needed)")
-    print("4. 📊 Run Installation Test")
-    print("5. 🔧 Show System Info")
-    print("6. 📚 View Help")
-    print("7. 🚪 Exit")
+    print("2. 🗣️ Launch PyArt with Voice Commands")
+    print("3. 🖼️  Run File Converter (convert images/videos to ASCII)")
+    print("4. 🎬 Run Effects Demo (no webcam needed)")
+    print("5. 📊 Run Installation Test")
+    print("6. 🔧 Show System Info")
+    print("7. 📚 View Help")
+    print("8. 🚪 Exit")
+    
+    while True:
+        try:
+            choice = input("\nEnter your choice (1-8): ").strip()
+            
+            if choice == '1':
+                print("Launching PyArt...")
+                subprocess.run([sys.executable, "main.py"])
+                break
+            
+            elif choice == '2':
+                print("Launching PyArt with Voice Commands...")
+                subprocess.run([sys.executable, "main.py", "--voice"])
+                break
+                
+            elif choice == '3':
+                print("Running File Converter...")
+                subprocess.run([sys.executable, "file_converter.py"])
+                break
+                
+            elif choice == '4':
+                print("Running Effects Demo...")
+                subprocess.run([sys.executable, "demo.py"])
+                break
+                
+            elif choice == '5':
+                print("Running Installation Test...")
+                subprocess.run([sys.executable, "test_installation.py"])
+                
+            elif choice == '6':
+                print_system_info()
+                
+            elif choice == '7':
+                show_help()
+                
+            elif choice == '8':
+                print("Goodbye! 👋")
+                break
+                
+            else:
+                print("Invalid choice. Please enter 1-8.")
+                
+        except KeyboardInterrupt:
+            print("\nGoodbye! 👋")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+    
+    print("\nChoose an option:")
+    print("1. 🎥 Launch PyArt (webcam required)")
+    print("2. 🗣️ Launch PyArt with Voice Commands")
+    print("3. 🖼️  Run File Converter (convert images/videos to ASCII)")
+    print("4. 🎬 Run Effects Demo (no webcam needed)")
+    print("5. 📊 Run Installation Test")
+    print("6. 🔧 Show System Info")
+    print("7. 📚 View Help")
+    print("8. 🚪 Exit")
     
     while True:
         try:
