@@ -1,0 +1,8 @@
+{
+    "camera_index": 0,
+    "frame_width": 640,
+    "frame_height": 480,
+    "default_effect": "ascii_blocks",
+    "default_intensity": 1.0,
+    "save_directory": "saved_images"
+}
