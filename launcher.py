@@ -62,40 +62,33 @@ def main():
     while True:
         try:
             choice = input("\nEnter your choice (1-7): ").strip()
-              if choice == '1':
+            
+            if choice == '1':
                 print("Launching PyArt...")
                 subprocess.run([sys.executable, "main.py"])
                 break
                 
             elif choice == '2':
-                print("Running File Converter...")
-                subprocess.run([sys.executable, "file_converter.py"])
-                break
-                
-            elif choice == '3':
                 print("Running Effects Demo...")
                 subprocess.run([sys.executable, "demo.py"])
                 break
                 
-            elif choice == '4':
+            elif choice == '3':
                 print("Running Installation Test...")
                 subprocess.run([sys.executable, "test_installation.py"])
-                break
                 
-            elif choice == '5':                print("\nSystem Information:")
+            elif choice == '4':
                 print_system_info()
-                input("\nPress Enter to continue...")
+                
+            elif choice == '5':
+                show_help()
                 
             elif choice == '6':
-                show_help()
-                input("\nPress Enter to continue...")
-                
-            elif choice == '7':
-                print("\nGoodbye! 👋")
+                print("Goodbye! 👋")
                 break
                 
             else:
-                print("Invalid choice. Please enter 1-7.")
+                print("Invalid choice. Please enter 1-6.")
                 
         except KeyboardInterrupt:
             print("\nGoodbye! 👋")
@@ -116,8 +109,8 @@ def show_help():
     │ +/-         - Adjust intensity      │
     │ R           - Reset to original     │
     │ H           - Toggle help overlay   │
-    │ G           - Toggle gesture control│
-    │ Q/ESC       - Quit application      │    │ 1-9         - Select effect directly│
+    │ Q/ESC       - Quit application      │
+    │ 1-9         - Select effect directly│
     └─────────────────────────────────────┘
     
     🆕 NEW ASCII ART EFFECTS:
@@ -137,18 +130,8 @@ def show_help():
     12. Psychedelic  - Colorful shifting patterns
     13. Blur         - Artistic blur effect
     14. Posterize    - Reduced color depth
-    15. HSV Shift    - Color space manipulation    16. Kaleidoscope - Symmetrical patterns
-    
-    🖼️ FILE CONVERTER:
-    • Convert any image to ASCII art
-    • Process videos into ASCII videos
-    • Save results as image/video files
-    • Adjust ASCII detail level for perfect results
-    
-    👋 GESTURE CONTROLS:
-    • Thumbs Up    - Increase ASCII detail
-    • Thumbs Down  - Decrease ASCII detail
-    • Closed Fist  - Capture photo
+    15. HSV Shift    - Color space manipulation
+    16. Kaleidoscope - Symmetrical patterns
     
     💡 ASCII ART TIPS:
     • Higher intensity = smaller characters (more detail)

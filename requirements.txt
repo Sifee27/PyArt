@@ -3,3 +3,7 @@ numpy==1.24.3
 Pillow==10.0.0
 pygame==2.5.2
 tk==0.1.0  # For file converter GUI
+mediapipe==0.10.7  # For advanced hand tracking
+scikit-learn==1.3.0  # For machine learning gesture classification
+scipy==1.11.3  # For signal processing and filtering
+imutils==0.5.4  # For additional computer vision utilities

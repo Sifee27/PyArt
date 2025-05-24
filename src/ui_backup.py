@@ -32,33 +32,33 @@ class UserInterface:
             ord('+'): 'increase_intensity',
             ord('='): 'increase_intensity',
             ord('-'): 'decrease_intensity',
-            ord('_'): 'decrease_intensity',
-            ord('r'): 'reset',
+            ord('_'): 'decrease_intensity',            ord('r'): 'reset',
             ord('R'): 'reset',
             ord('h'): 'toggle_help',
             ord('H'): 'toggle_help',
             ord('g'): 'toggle_gesture',
             ord('G'): 'toggle_gesture',
             ord('d'): 'toggle_debug',
-            ord('D'): 'toggle_debug',            ord('q'): 'quit',
+            ord('D'): 'toggle_debug',
+            ord('q'): 'quit',
             ord('Q'): 'quit',
-            27: 'quit'  # ESC key
-        }
+            27: 'quit',  # ESC key
+                }
         
-        # ASCII detail control only - remove all number-based effect selection
-        self.key_mappings[ord('1')] = 'decrease_ascii_detail'  # 1 = Decrease ASCII detail
-        self.key_mappings[ord('2')] = 'increase_ascii_detail'  # 2 = Increase ASCII detail
+        # Number keys for direct effect selection (1-9, then 0 for effect 10)
+        for i in range(1, 10):
+            self.key_mappings[ord(str(i))] = f'select_effect_{i-1}'
+        self.key_mappings[ord('0')] = 'select_effect_9'  # 0 = effect 10
         
-        # Letter keys for effects (A-F, skipping D which is toggle_debug)
-        self.key_mappings[ord('a')] = 'select_effect_0'   # A = Original
-        self.key_mappings[ord('b')] = 'select_effect_1'   # B = ASCII Simple  
-        self.key_mappings[ord('c')] = 'select_effect_2'   # C = ASCII Detailed
-        # D is reserved for toggle_debug 
-        self.key_mappings[ord('e')] = 'select_effect_3'   # E = ASCII Blocks
-        self.key_mappings[ord('f')] = 'select_effect_4'   # F = ASCII Color
+        # Letter keys for effects 11-16
+        self.key_mappings[ord('a')] = 'select_effect_10'  # A = Color Inversion
+        self.key_mappings[ord('b')] = 'select_effect_11'  # B = Pixelation  
+        self.key_mappings[ord('c')] = 'select_effect_12'  # C = Edge Detection
+        self.key_mappings[ord('d')] = 'select_effect_13'  # D = Psychedelic
+        self.key_mappings[ord('e')] = 'select_effect_14'  # E = Blur
+        self.key_mappings[ord('f')] = 'select_effect_15'  # F = Posterize
         # G and above reserved for future effects
-    
-    def create_window(self):
+      def create_window(self):
         """Create the display window"""
         if not self.window_created:
             cv2.namedWindow(self.window_name, cv2.WINDOW_AUTOSIZE)
@@ -230,8 +230,7 @@ class UserInterface:
         
         # Apply glass effect with enhanced blending
         cv2.addWeighted(overlay, 0.88, frame, 0.12, 0, frame)
-    
-    def _draw_help_overlay(self, frame: np.ndarray):
+      def _draw_help_overlay(self, frame: np.ndarray):
         """Draw modern help overlay with all controls"""
         height, width = frame.shape[:2]
         
@@ -252,11 +251,11 @@ class UserInterface:
                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         
         # Help sections with modern formatting
-        sections = [            ("Basic Controls:", [
+        sections = [
+            ("Basic Controls:", [
                 "SPACE - Cycle through effects",
                 "S - Save current frame as image",
                 "+/- - Adjust effect intensity",
-                "1/2 - Decrease/Increase ASCII detail",
                 "R - Reset to original view",
                 "H - Toggle this help panel",
                 "G - Toggle gesture controls",
@@ -267,22 +266,24 @@ class UserInterface:
                 "👍 Thumbs Up - Increase ASCII detail level",
                 "👎 Thumbs Down - Decrease ASCII detail level", 
                 "✊ Closed Fist - Capture and save photo"
-            ]),            ("ASCII Effects (3-9,0):", [
+            ]),
+            ("ASCII Effects (1-8):", [
+                "1. Original Camera View",
+                "2. ASCII Simple (Basic characters)",
                 "3. ASCII Detailed (Enhanced density)", 
                 "4. ASCII Blocks (Block patterns)",
                 "5. ASCII Color (Colored characters)",
                 "6. ASCII Inverted (Negative ASCII)",
                 "7. ASCII Psychedelic (Color effects)",
-                "8. ASCII Rainbow (Multi-color)",
+                "8. ASCII Rainbow (Multi-color)"
+            ]),
+            ("Classic Effects (9,0,A-F):", [
                 "9. Color Inversion",
-                "0. Pixelation"
-            ]),            ("Classic Effects (A-F):", [
+                "0. Pixelation",
                 "A. Edge Detection",
-                "B. Psychedelic Colors", 
+                "B. Psychedelic Colors",
                 "C. Motion Blur",
-                "E. HSV Shift",
-                "F. Kaleidoscope",
-                "Note: D is reserved for Debug toggle"
+                "D. Color Posterize"
             ])
         ]
         

@@ -126,12 +126,12 @@ class PyArtApp:
                 gesture_mode=self.gesture_mode,
                 ascii_detail=self.ascii_detail_level
             )
-            
-            # Handle user input
+              # Handle user input
             action = self.ui.handle_input()
             if action:
                 self.handle_action(action, processed_frame)
-              # Update frame time
+            
+            # Update frame time
             self.last_frame_time = current_time
         
         self.cleanup()
@@ -158,6 +158,18 @@ class PyArtApp:
         
         elif action == 'decrease_intensity':
             self.adjust_intensity(-0.1)
+        
+        elif action == 'decrease_ascii_detail':
+            # Decrease ASCII detail (more pixelated)
+            self.ascii_detail_level = clamp(self.ascii_detail_level - 0.3, 0.0, 2.0)
+            print(f"ASCII detail decreased: {self.ascii_detail_level:.1f}")
+            self.ui.show_info_temporarily(90)
+        
+        elif action == 'increase_ascii_detail':
+            # Increase ASCII detail (less pixelated)
+            self.ascii_detail_level = clamp(self.ascii_detail_level + 0.3, 0.0, 2.0)
+            print(f"ASCII detail increased: {self.ascii_detail_level:.1f}")
+            self.ui.show_info_temporarily(90)
         
         elif action == 'reset':
             self.reset_to_original()

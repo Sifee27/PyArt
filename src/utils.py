@@ -46,7 +46,7 @@ def save_image(frame: np.ndarray, directory: str = "saved_images",
         return None
     
     # Generate timestamp-based filename
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]  # Remove last 3 digits of microseconds
+    timestamp = get_timestamp()
     filename = f"{prefix}_{timestamp}.png"
     filepath = os.path.join(directory, filename)
     
@@ -61,6 +61,16 @@ def save_image(frame: np.ndarray, directory: str = "saved_images",
     except Exception as e:
         print(f"Error saving snapshot: {e}")
         return None
+
+
+def get_timestamp() -> str:
+    """
+    Generate a timestamp string for filename usage
+    
+    Returns:
+        str: Timestamp in format YYYYMMDD_HHMMSS_mmm
+    """
+    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]  # Remove last 3 digits of microseconds
 
 
 def load_config(config_path: str = "config.json") -> dict:

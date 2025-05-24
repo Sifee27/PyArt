@@ -132,11 +132,10 @@ class FileConverterApp:
         effect_dropdown.bind("<<ComboboxSelected>>", self.on_effect_changed)
         
         ttk.Separator(control_frame, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=10)
-        
-        # ASCII Detail level
+          # ASCII Detail level
         ttk.Label(control_frame, text="ASCII Detail Level:").pack(anchor=tk.W, pady=(0, 5))
         
-        self.detail_var = tk.DoubleVar(value=1.0)
+        self.detail_var = tk.DoubleVar(value=0.5)  # Lower default for better performance
         detail_scale = ttk.Scale(
             control_frame,
             from_=0.0,
@@ -147,7 +146,7 @@ class FileConverterApp:
         )
         detail_scale.pack(fill=tk.X, pady=2)
         
-        self.detail_value_label = ttk.Label(control_frame, text="1.0")
+        self.detail_value_label = ttk.Label(control_frame, text="0.5")
         self.detail_value_label.pack(anchor=tk.E)
         
         ttk.Separator(control_frame, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=10)
