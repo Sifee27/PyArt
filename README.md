@@ -10,6 +10,7 @@ PyArt is a Python-based interactive art application that uses your computer's we
 - **ASCII Art**: Transform your webcam feed into ASCII art with various styles
 - **16 Visual Effects**: Including ASCII variants and classic visual effects
 - **Hand Gesture Controls**: Use thumbs up/down to adjust ASCII detail level and fist gesture to capture photos
+- **Image & Video Converter**: Convert any image or video file to ASCII art
 - **Interactive Controls**: Keyboard shortcuts to switch effects and adjust parameters
 - **Snapshot Capture**: Save your favorite moments as image files
 - **Modular Design**: Easy to extend with new effects
@@ -85,6 +86,29 @@ python test_installation.py
 - **👍 Thumbs Up**: Increase ASCII detail level
 - **👎 Thumbs Down**: Decrease ASCII detail level
 - **✊ Closed Fist**: Capture a snapshot
+
+## 🖼️ File Converter
+
+PyArt now includes a dedicated file converter that allows you to transform any image or video into ASCII art!
+
+### Features
+
+- **Image Conversion**: Convert any image to ASCII art with 8 different styles
+- **Video Processing**: Transform videos into ASCII art videos
+- **Adjustable Detail**: Fine-tune the ASCII detail level for optimal results
+- **Batch Processing**: Process multiple files with the same settings
+- **Preview Mode**: See the results before saving
+
+### Usage
+
+```bash
+# Launch the file converter directly
+python file_converter.py
+
+# Or select option 2 from the launcher menu
+python launcher.py
+```
+
 ## 🎨 Available Effects
 
 ### Original

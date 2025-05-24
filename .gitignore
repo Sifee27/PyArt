@@ -27,5 +27,11 @@ build/
 Thumbs.db
 
 # PyArt specific
-saved_images/*
+saved_images/*.png
+saved_images/*.jpg
+saved_images/*.jpeg
 !saved_images/.gitkeep
+
+# Python cache
+src/__pycache__/
+*/__pycache__/

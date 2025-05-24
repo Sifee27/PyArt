@@ -13,6 +13,9 @@ Or double-click `run_pyart.bat` on Windows
 # Main application (requires webcam)
 python main.py
 
+# File converter (for images and videos)
+python file_converter.py
+
 # Demo mode (no webcam needed)
 python demo.py
 
@@ -31,6 +34,24 @@ python test_installation.py
 | `H` | Toggle help overlay |
 | `Q/ESC` | Quit application |
 | `1-9` | Select specific effect |
+
+### Gesture Controls
+- **👍 Thumbs Up**: Increase ASCII detail level
+- **👎 Thumbs Down**: Decrease ASCII detail level
+- **✊ Closed Fist**: Capture a snapshot
+
+## 🖼️ File Converter
+
+The File Converter allows you to transform any image or video into ASCII art.
+
+### How to Use
+1. Launch the file converter: `python file_converter.py`
+2. Click "Open Image" or "Open Video" to select a file
+3. Choose an ASCII effect from the dropdown menu
+4. Adjust the ASCII detail level using the slider
+5. Click "Process" to apply the effect
+6. Save the result using the "Save" button
+7. For videos, click "Process Video" to create a full ASCII video
 
 ## 🎨 Available Effects
 
