@@ -22,6 +22,7 @@ from src.camera import Camera
 from src.effects import EffectProcessor
 from src.ui import UserInterface
 from src.utils import save_image, save_config, load_config, clamp
+from src.emoji_generator import get_emoji_generator
 
 # Import gesture detection if available
 try:
@@ -155,36 +156,16 @@ class PyArtApp:
         self.trail_frames = []
         self.max_trail_frames = 5
         self.trail_decay = 0.7
-        
-        # Face tracking effects
+          # Face tracking effects
         self.face_tracking_mode = False
         self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         if self.face_cascade.empty():
             print("Warning: Failed to load face cascade classifier. Face tracking will not work.")
         self.face_effect_type = 0  # 0: highlight, 1: pixelate, 2: emoji
         
-        # Graphical Emojis
-        self.emoji_image_paths = [
-            os.path.join("assets", "emojis", "sunglasses.png"),
-            os.path.join("assets", "emojis", "joy.png"),
-            os.path.join("assets", "emojis", "heart_eyes.png"),
-            os.path.join("assets", "emojis", "thinking.png")
-        ]
-        self.loaded_emojis = []
-        self.current_emoji_index = 0
-        
-        base_path = os.path.dirname(os.path.abspath(__file__)) if "__file__" in locals() else os.getcwd()
-
-        for rel_path in self.emoji_image_paths:
-            abs_path = os.path.join(base_path, rel_path)
-            emoji = cv2.imread(abs_path, cv2.IMREAD_UNCHANGED)
-            if emoji is not None:
-                self.loaded_emojis.append(emoji)
-            else:
-                print(f"Warning: Could not load emoji image: {abs_path}")
-        
-        if not self.loaded_emojis:
-            print("Warning: No emoji images loaded. Emoji effect (type 2) may not work as expected.")        # Set initial effect index
+        # Initialize emoji generator
+        self.emoji_generator = get_emoji_generator(emoji_size=64)
+        self.current_emoji_index = 0# Set initial effect index
         if self.current_effect in self.effect_names:
             self.current_effect_index = self.effect_names.index(self.current_effect)
         
@@ -524,7 +505,7 @@ class PyArtApp:
         elif action == 'toggle_face_tracking':
             self.face_tracking_mode = not self.face_tracking_mode
             print(f"Face tracking mode: {'ON' if self.face_tracking_mode else 'OFF'}")
-
+        
         elif action == 'cycle_face_effect':
             if self.face_tracking_mode:
                 self.face_effect_type = (self.face_effect_type + 1) % 3 # 0: highlight, 1: pixelate, 2: emoji
@@ -535,11 +516,12 @@ class PyArtApp:
         
         elif action == 'next_face_emoji':
             if self.face_tracking_mode and self.face_effect_type == 2: # Emoji effect is type 2
-                if self.loaded_emojis:
-                    self.current_emoji_index = (self.current_emoji_index + 1) % len(self.loaded_emojis)
-                    print(f"Changed to emoji: {self.emoji_image_paths[self.current_emoji_index]}")
+                emoji_count = self.emoji_generator.get_emoji_count()
+                if emoji_count > 0:
+                    self.current_emoji_index = (self.current_emoji_index + 1) % emoji_count
+                    print(f"Changed to emoji index: {self.current_emoji_index}")
                 else:
-                    print("No emojis loaded to cycle through.")
+                    print("No emojis available to cycle through.")
             elif not self.face_tracking_mode:
                 print("Enable face tracking first (default key 'F') to change emoji.")
             else: # Face tracking is on, but not emoji effect
@@ -692,14 +674,15 @@ class PyArtApp:
                 print(f"Face effect changed to: {effects[self.face_effect_type]}")
             else:
                 print("Enable face tracking first to cycle effects.")
-                
+        
         elif command == 'next_face_emoji':
             if self.face_tracking_mode and self.face_effect_type == 2: # Emoji effect is type 2
-                if self.loaded_emojis:
-                    self.current_emoji_index = (self.current_emoji_index + 1) % len(self.loaded_emojis)
-                    print(f"Changed to emoji: {self.emoji_image_paths[self.current_emoji_index]}")
+                emoji_count = self.emoji_generator.get_emoji_count()
+                if emoji_count > 0:
+                    self.current_emoji_index = (self.current_emoji_index + 1) % emoji_count
+                    print(f"Changed to emoji index: {self.current_emoji_index}")
                 else:
-                    print("No emojis loaded to cycle through.")
+                    print("No emojis available to cycle through.")
             elif not self.face_tracking_mode:
                 print("Enable face tracking first to change emoji.")
             else:
@@ -1177,17 +1160,16 @@ class PyArtApp:
                 
                 # Scale back up using nearest neighbor interpolation for pixelated look
                 pixelated = cv2.resize(small, (w, h), interpolation=cv2.INTER_NEAREST)
-                
-                # Put the pixelated face back into the frame
+                  # Put the pixelated face back into the frame
                 result[y:y+h, x:x+w] = pixelated
-                
+            
             elif self.face_effect_type == 2:
                 # Emoji overlay effect
-                if not self.loaded_emojis:
-                    print("Emoji effect selected, but no emojis are loaded. Skipping.")
-                    return result # Or draw a placeholder / error message on frame
+                current_emoji_img = self.emoji_generator.get_emoji(self.current_emoji_index)
                 
-                current_emoji_img = self.loaded_emojis[self.current_emoji_index]
+                if current_emoji_img is None:
+                    print("No emoji available for overlay effect")
+                    return result
                 
                 # Resize emoji to fit the face, maintaining aspect ratio
                 eh, ew = current_emoji_img.shape[:2]
@@ -1237,3 +1219,14 @@ class PyArtApp:
                     result[pos_y:pos_y+new_eh, pos_x:pos_x+new_ew] = resized_emoji[:,:,:3] # Use only BGR
         
         return result
+
+# End of PyArtApp class
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run PyArt application")
+    parser.add_argument("--voice", action="store_true", help="Enable voice command mode")
+    args = parser.parse_args()
+    app = PyArtApp()
+    if args.voice and app.voice_processor:
+        app.voice_mode = True
+    app.run()

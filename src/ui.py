@@ -63,9 +63,9 @@ class UserInterface:
         if not self.window_created:
             cv2.namedWindow(self.window_name, cv2.WINDOW_AUTOSIZE)
             self.window_created = True
-    
+     
     def display_frame(self, frame: np.ndarray, current_effect: str, intensity: float, 
-                     effect_names: list, gesture_mode: bool = False, ascii_detail: float = 1.0):
+                     effect_names: list, gesture_mode: bool = False, voice_mode: bool = False, ascii_detail: float = 1.0):
         """
         Display frame with UI overlay information
         
@@ -75,6 +75,7 @@ class UserInterface:
             intensity: Current effect intensity
             effect_names: List of all available effects
             gesture_mode: Whether gesture control is enabled
+            voice_mode: Whether voice control is enabled
             ascii_detail: Current ASCII detail level
         """
         if not self.window_created:
@@ -85,7 +86,7 @@ class UserInterface:
         # Add UI overlays
         if self.show_info or self.info_timer > 0:
             self._draw_info_overlay(display_frame, current_effect, intensity, effect_names, 
-                                   gesture_mode, ascii_detail)
+                                   gesture_mode, voice_mode, ascii_detail)
             if self.info_timer > 0:
                 self.info_timer -= 1
         
@@ -96,7 +97,7 @@ class UserInterface:
     
     def _draw_info_overlay(self, frame: np.ndarray, current_effect: str, 
                           intensity: float, effect_names: list, gesture_mode: bool = False,
-                          ascii_detail: float = 1.0):
+                          voice_mode: bool = False, ascii_detail: float = 1.0):
         """Draw modern, clean information overlay on the frame"""
         height, width = frame.shape[:2]
         

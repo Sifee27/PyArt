@@ -329,8 +329,7 @@ class EffectProcessor:
                 distance = np.sqrt((x - center_x)**2 + (y - center_y)**2)
                 vignette_factor = 1.0 - (distance / max_distance) * 0.3
                 result[y, x] = result[y, x] * vignette_factor
-        
-        # Add slight blur for CRT softness
+          # Add slight blur for CRT softness
         result = cv2.GaussianBlur(result, (3, 3), 0)
         
         return result
@@ -349,20 +348,19 @@ class EffectProcessor:
             glow_layers.append(glow)
         
         # Combine glow layers with different colors
-        neon_overlay = np.zeros_like(frame)
+        neon_overlay = np.zeros_like(frame, dtype=np.float32)
         colors = [(255, 0, 255), (0, 255, 255), (255, 255, 0), (0, 255, 0)]  # Magenta, Cyan, Yellow, Green
         
         for i, (glow, color) in enumerate(zip(glow_layers, colors)):
-            colored_glow = np.zeros_like(frame)
+            colored_glow = np.zeros_like(frame, dtype=np.float32)
             for c in range(3):
-                colored_glow[:, :, c] = glow[:, :, 0] * (color[c] / 255.0)
-            neon_overlay = cv2.add(neon_overlay, colored_glow)
+                colored_glow[:, :, c] = glow[:, :, 0].astype(np.float32) * (color[c] / 255.0)
+            neon_overlay = neon_overlay + colored_glow
         
         # Darken original image
-        dark_frame = frame * 0.3
-        
-        # Combine with glow
-        result = cv2.addWeighted(dark_frame, 0.7, neon_overlay, 0.3, 0)
+        dark_frame = frame.astype(np.float32) * 0.3
+          # Combine with glow
+        result = cv2.addWeighted(dark_frame.astype(np.uint8), 0.7, neon_overlay.astype(np.uint8), 0.3, 0)
         
         return result.astype(np.uint8)
     
@@ -381,16 +379,16 @@ class EffectProcessor:
         # Convert edges to 3-channel
         edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
         
-        # Reduce edge intensity for watercolor look
-        edges = edges * 0.7
+        # Reduce edge intensity for watercolor look - ensure proper dtype
+        edges = (edges.astype(np.float32) * 0.7).astype(np.uint8)
         
         # Combine watercolor and edges
         result = cv2.bitwise_and(watercolor, edges)
         
         # Slightly desaturate for watercolor effect
-        hsv = cv2.cvtColor(result, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(result, cv2.COLOR_BGR2HSV).astype(np.float32)
         hsv[:, :, 1] = hsv[:, :, 1] * 0.8  # Reduce saturation
-        result = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+        result = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
         
         return result
     
