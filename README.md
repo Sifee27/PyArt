@@ -46,7 +46,7 @@ Run `./setup.sh` or follow the manual steps below.
 
 1. **Grab the code:**
 ```bash
-git clone https://github.com/yourusername/PyArt.git
+git clone https://github.com/Sifee27/PyArt.git
 cd PyArt
 ```
 
