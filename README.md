@@ -42,7 +42,7 @@
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/yourusername/pyart
+git clone https://github.com/sifee27/pyart
 cd pyart
 
 pip install -r requirements.txt
