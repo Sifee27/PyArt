@@ -1,6 +1,6 @@
 """
-Voice commands module for PyArt
-Handles speech recognition and voice command processing
+Voice commands for PyArt
+Because talking to your computer is way cooler than clicking buttons
 """
 
 import threading
@@ -10,10 +10,10 @@ from typing import Dict, Callable, List, Optional
 
 
 class VoiceCommandProcessor:
-    """Processes voice commands for PyArt application"""
+    """Listens for voice commands and makes magic happen"""
     
     def __init__(self):
-        """Initialize voice command processor"""
+        """Set up the voice command system"""
         self.recognizer = sr.Recognizer()
         self.microphone = None
         self.is_listening = False
@@ -32,8 +32,7 @@ class VoiceCommandProcessor:
             'zoom_out': ['zoom out', 'further', 'reduce size'],
             'toggle_help': ['show help', 'help menu', 'display help'],
             'exit_app': ['exit', 'quit', 'close application'],
-            
-            # Added advanced voice commands for cool features
+              # The fun stuff I added later
             'toggle_night_vision': ['night vision', 'enable night vision', 'dark mode'],
             'toggle_motion_trails': ['motion trails', 'enable trails', 'show trails'],
             'toggle_face_tracking': ['face tracking', 'track faces', 'detect faces'],
@@ -45,7 +44,7 @@ class VoiceCommandProcessor:
             'next_face_emoji': ['next emoji', 'change emoji', 'different emoji'],
         }
         
-        # Error handling counters
+        # Keep track of recognition failures so we don't spam errors
         self.recognition_errors = 0
         self.max_consecutive_errors = 5
         self.error_cooldown_time = 0

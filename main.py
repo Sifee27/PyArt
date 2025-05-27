@@ -1,14 +1,17 @@
 """
 PyArt - Interactive Webcam Art Application
-Main application entry point
+Main entry point for all the visual chaos
 
-This is the main file that orchestrates all components of PyArt:
-- Camera capture
-- Effect processing
-- User interface
-- Input handling
-- Video recording
-- Advanced image manipulation
+This started as a simple ASCII art converter and somehow became this whole thing.
+Now it handles:
+- Live camera feed processing
+- 20+ visual effects (some are pretty wild)
+- Hand gesture controls (surprisingly reliable)
+- Voice commands (when it feels like working)
+- Face tracking with emoji overlays (don't ask why)
+- Recording and screenshots
+
+If something breaks, it's probably my fault. -Jade
 """
 
 import sys
@@ -52,12 +55,13 @@ class PyArtApp:
     
     def __init__(self):
         """Initialize the PyArt application"""
-        print("Initializing PyArt...")
+        print("Getting PyArt ready...")
         print_system_info()
         
         # Load configuration
         self.config = load_config()
-          # Initialize components
+        
+        # Initialize components
         self.camera = Camera(
             camera_index=self.config['camera_index'],
             width=self.config['frame_width'],
@@ -188,8 +192,7 @@ class PyArtApp:
         
         # Set up mouse callback for drawing mode
         cv2.setMouseCallback(self.ui.window_name, self.handle_mouse_drawing)
-        
-        # Initialize voice commands if enabled
+          # Initialize voice commands if enabled
         if self.voice_mode and self.voice_processor:
             if self.voice_processor.initialize():
                 # Set up voice command callback
@@ -203,7 +206,7 @@ class PyArtApp:
                 print("Warning: Voice command system failed to initialize.")
                 self.voice_mode = False
         
-        print("PyArt initialized successfully!")
+        print("PyArt is ready to go!")
         print("Press 'H' for help, 'Q' to quit")
         return True
     

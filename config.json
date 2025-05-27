@@ -2,7 +2,7 @@
     "camera_index": 0,
     "frame_width": 640,
     "frame_height": 480,
-    "default_effect": "hsv_shift",
+    "default_effect": "ascii_simple",
     "default_intensity": 0.9,
     "save_directory": "saved_images"
 }
